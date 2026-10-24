@@ -5,7 +5,7 @@
   "author": "me",
   "version": "0.1.0",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "ВСТАВЬ_ВЕРСИЮ_ИГРЫ",
+  "packageVersion": "1.40.8_7379",
   "description": "Plays a video file as background in every level.",
   "modloader": "Scotland2",
   "modFiles": [],
