@@ -1,0 +1,34 @@
+name: Build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: QuestPackageManager/qpm-action@v1
+        with:
+          workflow_token: ${{ secrets.GITHUB_TOKEN }}
+          restore: true
+          cache: true
+          publish: false
+      - uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: r27
+      - name: Build
+        run: |
+          NDK=${{ steps.ndk.outputs.ndk-path }}
+          cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build .
+          cmake --build build
+      - name: Pack qmod
+        run: |
+          mkdir out
+          cp build/libcinema-lite.so out/
+          cp extern/libs/libbeatsaber-hook*.so extern/libs/libpaper2_scotland2*.so out/ || true
+          LIBS=$(cd out && ls lib*.so | grep -v cinema-lite | jq -R . | jq -s .)
+          jq --argjson l "$LIBS" '.libraryFiles=$l' mod.json > out/mod.json
+          cd out && zip -r ../CinemaLite.qmod .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CinemaLite.qmod
+          path: CinemaLite.qmod
