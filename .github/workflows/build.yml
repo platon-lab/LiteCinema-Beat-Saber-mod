@@ -5,16 +5,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: QuestPackageManager/qpm-action@v1
-        with:
-          workflow_token: ${{ secrets.GITHUB_TOKEN }}
-          restore: true
-          cache: true
-          publish: false
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build jq zip
+      - name: Install QPM
+        run: |
+          curl -fsSL -o qpm.zip https://github.com/QuestPackageManager/QPM.CLI/releases/latest/download/qpm-linux-x64.zip || true
+          if [ -f qpm.zip ] && unzip -tq qpm.zip; then
+            unzip -o qpm.zip -d qpmbin
+            chmod +x qpmbin/qpm
+            sudo mv qpmbin/qpm /usr/local/bin/qpm
+          else
+            cargo install qpm_cli
+            sudo cp ~/.cargo/bin/qpm /usr/local/bin/qpm
+          fi
+          qpm --version
       - uses: nttld/setup-ndk@v1
         id: ndk
         with:
           ndk-version: r27
+      - name: Restore dependencies
+        run: qpm restore
       - name: Build
         run: |
           NDK=${{ steps.ndk.outputs.ndk-path }}
