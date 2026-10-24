@@ -17,9 +17,9 @@
     "qmodOutput": null
   },
   "dependencies": [
-    { "id": "beatsaber-hook", "versionRange": "^6.4.1", "additionalData": {} },
-    { "id": "bs-cordl", "versionRange": "^4001.0.0", "additionalData": {} },
-    { "id": "scotland2", "versionRange": "^0.1.6", "additionalData": { "includeQmod": false } },
-    { "id": "paper2_scotland2", "versionRange": "^4.6.0", "additionalData": {} }
+  { "id": "beatsaber-hook", "versionRange": "*", "additionalData": {} },
+  { "id": "bs-cordl", "versionRange": "*", "additionalData": {} },
+  { "id": "scotland2", "versionRange": "*", "additionalData": { "includeQmod": false } },
+  { "id": "paper2_scotland2", "versionRange": "*", "additionalData": {} }
   ]
 }
