@@ -30,3 +30,15 @@ target_include_directories(${COMPILE_ID} PRIVATE .)
 
 include(extern.cmake)
 target_link_libraries(${COMPILE_ID} PRIVATE -llog)
+
+# Auto-find headers whose folder layout differs between package versions
+set(FIX_INC ${CMAKE_BINARY_DIR}/fix_inc)
+file(MAKE_DIRECTORY ${FIX_INC})
+
+function(link_pkg pkg_name marker_glob)
+    file(GLOB_RECURSE found "${EXTERN_DIR}/${marker_glob}")
+    list(LENGTH found n)
+    if(n EQUAL 0)
+        file(GLOB_RECURSE all "${EXTERN_DIR}/includes/${pkg_name}/*")
+        list(LENGTH all cnt)
+        message(FATAL_ERROR "NOT FOUND: ${marker_glob} (files in includes
