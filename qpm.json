@@ -16,10 +16,11 @@
     "qmodIncludeFiles": [],
     "qmodOutput": null
   },
-  "dependencies": [
+    "dependencies": [
     { "id": "beatsaber-hook", "versionRange": "*", "additionalData": {} },
     { "id": "bs-cordl", "versionRange": "*", "additionalData": {} },
     { "id": "scotland2", "versionRange": "*", "additionalData": { "includeQmod": false } },
-    { "id": "paper2_scotland2", "versionRange": "*", "additionalData": {} }
-  ]
+    { "id": "paper2_scotland2", "versionRange": "*", "additionalData": {} },
+    { "id": "flamingo", "versionRange": "*", "additionalData": {} }
+    ]
 }
