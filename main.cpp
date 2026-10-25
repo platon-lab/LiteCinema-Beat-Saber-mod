@@ -1,5 +1,6 @@
 #include "scotland2/shared/modloader.h"
-#include "beatsaber-hook/shared/hooking.hpp"
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "paper2_scotland2/shared/logger.hpp"
 
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
@@ -27,13 +28,13 @@ constexpr auto Logger = Paper::ConstLoggerContext("CinemaLite");
 static const std::string VIDEO_PATH =
     "/sdcard/ModData/com.beatgames.beatsaber/Mods/CinemaLite/video.mp4";
 
-static UnityW<UnityEngine::GameObject> screenObj;
 static UnityW<UnityEngine::Video::VideoPlayer> player;
 static float lastSongTime = -999.f;
 
 MAKE_HOOK_MATCH(ATSC_Start, &GlobalNamespace::AudioTimeSyncController::Start, void,
                 GlobalNamespace::AudioTimeSyncController* self) {
     ATSC_Start(self);
+    player = nullptr;
 
     if (!std::filesystem::exists(VIDEO_PATH)) {
         Logger.info("Video not found: {}", VIDEO_PATH);
@@ -41,16 +42,16 @@ MAKE_HOOK_MATCH(ATSC_Start, &GlobalNamespace::AudioTimeSyncController::Start, vo
     }
 
     auto go = UnityEngine::GameObject::CreatePrimitive(UnityEngine::PrimitiveType::Quad);
-    screenObj = go;
-    if (auto col = go->GetComponent<UnityEngine::Collider*>())
-        UnityEngine::Object::Destroy(col);
+    auto col = go->GetComponent<UnityEngine::Collider*>();
+    if (col) UnityEngine::Object::Destroy(col);
 
     auto t = go->get_transform();
     t->set_position(UnityEngine::Vector3(0.f, 12.f, 80.f));
     t->set_localScale(UnityEngine::Vector3(128.f, 72.f, 1.f));
 
     auto renderer = go->GetComponent<UnityEngine::Renderer*>();
-    UnityEngine::Shader* shader = nullptr;
+
+    UnityW<UnityEngine::Shader> shader;
     for (auto name : {"Sprites/Default", "Unlit/Texture", "UI/Default"}) {
         shader = UnityEngine::Shader::Find(name);
         if (shader) break;
@@ -59,19 +60,19 @@ MAKE_HOOK_MATCH(ATSC_Start, &GlobalNamespace::AudioTimeSyncController::Start, vo
         Logger.error("No usable shader found");
         return;
     }
-    renderer->set_material(UnityEngine::Material::New_ctor(shader));
+    renderer->set_material(UnityEngine::Material::New_ctor(shader.ptr()));
 
     auto vp = go->AddComponent<UnityEngine::Video::VideoPlayer*>();
-    player = vp;
     vp->set_playOnAwake(false);
     vp->set_source(UnityEngine::Video::VideoSource::Url);
-    vp->set_url("file://" + VIDEO_PATH);
+    vp->set_url(StringW("file://" + VIDEO_PATH));
     vp->set_renderMode(UnityEngine::Video::VideoRenderMode::MaterialOverride);
     vp->set_targetMaterialRenderer(renderer);
     vp->set_targetMaterialProperty("_MainTex");
     vp->set_audioOutputMode(UnityEngine::Video::VideoAudioOutputMode::None);
     vp->set_isLooping(false);
     vp->Prepare();
+    player = vp;
     lastSongTime = -999.f;
     Logger.info("Cinema screen created");
 }
@@ -103,6 +104,7 @@ extern "C" __attribute__((visibility("default"))) void setup(CModInfo* info) {
 }
 
 extern "C" __attribute__((visibility("default"))) void late_load() {
+    il2cpp_functions::Init();
     INSTALL_HOOK(Logger, ATSC_Start);
     INSTALL_HOOK(Logger, ATSC_Update);
 }
