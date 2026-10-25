@@ -1,6 +1,5 @@
 #include "scotland2/shared/modloader.h"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/hooking.hpp"
 #include "paper2_scotland2/shared/logger.hpp"
 
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
