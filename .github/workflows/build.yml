@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y ninja-build jq zip
+        run: sudo apt-get update && sudo apt-get install -y ninja-build zip
       - name: Install QPM
         run: |
           curl -fsSL -o qpm.zip https://github.com/QuestPackageManager/QPM.CLI/releases/latest/download/qpm-linux-x64.zip || true
@@ -18,20 +18,14 @@ jobs:
             cargo install qpm_cli
             sudo cp ~/.cargo/bin/qpm /usr/local/bin/qpm
           fi
-          qpm --version
       - uses: nttld/setup-ndk@v1
         id: ndk
         with:
-          ndk-version: r28
+          ndk-version: r27
       - name: Restore dependencies
         run: qpm restore
       - name: Build
         run: |
-      - name: Debug
-        run: |
-          ls extern/includes
-          ls extern/includes/beatsaber-hook || true
-          ls extern/includes/scotland2 || true
           NDK=${{ steps.ndk.outputs.ndk-path }}
           cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build .
           cmake --build build
@@ -39,9 +33,7 @@ jobs:
         run: |
           mkdir out
           cp build/libcinema-lite.so out/
-          for f in extern/libs/lib*.so; do case "$f" in *debug*|*libsl2*) ;; *) cp "$f" out/;; esac; done
-          LIBS=$(cd out && ls lib*.so | grep -v cinema-lite | jq -R . | jq -s .)
-          jq --argjson l "$LIBS" '.libraryFiles=$l' mod.json > out/mod.json
+          cp mod.json out/
           cd out && zip -r ../CinemaLite.qmod .
       - uses: actions/upload-artifact@v4
         with:
