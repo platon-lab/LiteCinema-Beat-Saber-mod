@@ -25,7 +25,7 @@ add_library(${COMPILE_ID} SHARED main.cpp)
 target_compile_definitions(${COMPILE_ID} PRIVATE
     MOD_ID="${MOD_ID}" VERSION="${MOD_VERSION}" FMT_HEADER_ONLY)
 target_compile_options(${COMPILE_ID} PRIVATE
-    -Wno-invalid-offsetof -Wno-deprecated-declarations)
+        -Wno-invalid-offsetof -Wno-deprecated-declarations -Wno-invalid-constexpr)
 target_include_directories(${COMPILE_ID} PRIVATE .)
 
 include(extern.cmake)
