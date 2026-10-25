@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir out
           cp build/libcinema-lite.so out/
-          cp extern/libs/libbeatsaber-hook*.so extern/libs/libpaper2_scotland2*.so out/ || true
+          for f in extern/libs/lib*.so; do case "$f" in *debug*|*libsl2*) ;; *) cp "$f" out/;; esac; done
           LIBS=$(cd out && ls lib*.so | grep -v cinema-lite | jq -R . | jq -s .)
           jq --argjson l "$LIBS" '.libraryFiles=$l' mod.json > out/mod.json
           cd out && zip -r ../CinemaLite.qmod .
