@@ -22,6 +22,13 @@ macro(RECURSE_FILES return_list filter)
 endmacro()
 
 add_library(${COMPILE_ID} SHARED main.cpp)
+
+file(GLOB_RECURSE HOOK_SRC_C FOLLOW_SYMLINKS
+    "${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.c")
+file(GLOB_RECURSE HOOK_SRC_CPP FOLLOW_SYMLINKS
+    "${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.cpp")
+target_sources(${COMPILE_ID} PRIVATE ${HOOK_SRC_C} ${HOOK_SRC_CPP})
+
 target_compile_definitions(${COMPILE_ID} PRIVATE
     MOD_ID="${MOD_ID}" VERSION="${MOD_VERSION}" FMT_HEADER_ONLY)
 target_compile_options(${COMPILE_ID} PRIVATE
