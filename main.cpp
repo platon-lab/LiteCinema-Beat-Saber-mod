@@ -103,7 +103,6 @@ extern "C" __attribute__((visibility("default"))) void setup(CModInfo* info) {
 }
 
 extern "C" __attribute__((visibility("default"))) void late_load() {
-    il2cpp_functions::Init();
     INSTALL_HOOK(Logger, ATSC_Start);
     INSTALL_HOOK(Logger, ATSC_Update);
 }
